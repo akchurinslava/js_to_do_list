@@ -3,6 +3,8 @@
 <head>
 	<meta charset="UTF-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"/>
 	<link rel="stylesheet" href="css/main.css"/>
 	<title>To Do List</title>
@@ -11,12 +13,15 @@
 
 	<div class="container">
 
-		<div class="display-4 mb-2">To Do Application</div>
+		<!-- <div class="display-4 mb-2">To Do Application</div> -->
 		
 
 		<!-- List of tasks -->
-		<div class="card mb-4">
+		
+		<div class="card mb-4" style="margin-top: 150px;">
+			
 			<ul id="tasksList" class="list-group list-group-flush">
+				<!-- <button type="button" data-action="sortList" class="btn-action" style="height: 40px;"><strong>SORT</strong></button> -->
 
 				<!-- <li id="emptyList" class="list-group-item empty-list">
 					<img src="./img/leaf.svg" alt="Empty" width="48" class="mt-3">
@@ -40,24 +45,123 @@
 		<!-- //List of tasks -->
 
 		<!-- Form -->
-		<div class="card bg-light" >
-			<div class="card-header">Add new task</div>
-			<div class="card-body">
-				<form id="form">
-					<div class="form-group">
-						<input type="text" class="form-control" id="taskInput" placeholder="Task text" required>
-						<small id="emailHelp" class="form-text text-muted">Name of task, how long we do, result we get.</small>
+		
+		<div class="card bg-light">
+			<div class="card-header" style="background-color: white;">ADD NEW TASK:</div>
+			<div class="card-body" style="background-color: white;" ><button id="openPopup">SEND MAIL</button>
+				<form id="form" class="contact_form">
+					<div id="numbers">
+					<input type="number" class="form-control" id="hoursInput" placeholder="Hours:" required style="width: 102px; margin-right: 5px;" min="00" max="23">
+					<input type="number" class="form-control" id="minutesInput" placeholder="Minutes:" required style="width: 102px; margin-right: 5px;" min="00" max="59">
+					<input type="number" class="form-control" id="dayInput" placeholder="Day:" required style="width: 102px; margin-right: 5px;" min="1" max="31">
+					<input type="number" class="form-control" id="monthInput" placeholder="Month:" required style="width: 102px; margin-right: 5px;" min="1" max="12">
+					<input type="number" class="form-control" id="yearInput" placeholder="Year:" required style="width: 102px; margin-right: 5px;" min="2023">
+					<div style="display: flex;"><button id="removeDoneTasks" class="btn btn-primary btn-lg active" style="border: none;
+						width: 150px;
+						outline: none;
+						width: auto;
+						
+						background: #f30212;
+						color: #fff;
+						font-size: 15px;
+						cursor: pointer;">REMOVE ALL</button>
+						</div>
+						
+					</div>
+					<br>
+					<div class="form-group" style="display: flex; align-items: center; justify-content: space-between; background: #edeef0; border-radius: 30px; padding-left: 20px; margin-bottom: 25px;">
+
+						<input type="text" class="form-control" id="taskInput" placeholder="Enter task text" required style="  flex: 1;
+						border: none;
+						outline: none;
+						background: transparent;
+						padding: 10px;
+						font-weight: 14px;">
+						<button type="submit" class="btn btn-primary  btn-lg active" style="  border: none;
+						width: 150px;
+						outline: none;
+						padding: 20px 50px;
+						background: #45beff;
+						color: #fff;
+						font-size: 15px;
+						cursor: pointer;
+						border-radius: 40px;">ADD</button>
+
+						<!-- <small id="emailHelp" class="form-text text-muted">Name of task, how long we do, result we get.</small> -->
 					</div>
 					<div>
-					<button type="submit" class="btn btn-primary  btn-lg active" style="width: 100%;">Add</button>
-					<button id="removeDoneTasks" class="btn btn-secondary mt-4 float-right" style="width: 100%;">Удалить выполненные задачи</button>
+					<!-- <button type="submit" class="btn btn-primary  btn-lg active" style="width: 100%;">ADD</button>
+					<button id="removeDoneTasks" class="btn btn-secondary mt-4 float-right" style="width: 100%;">Delete finished tasks</button> -->
 					</div>
 				</form>
+				
 			</div>
 		</div>
 		<!-- Form  -->
+		
 
+<!-- Всплывающее окно -->
+<div id="popup">
+	<input type="text" class="form-control" id="" placeholder="Enter mail" required style="  flex: 1;
+	
+	outline: none;
+	background: transparent;
+	padding: 10px;
+	font-weight: 14px;">
+		    <button id="sendPopup" class="btn btn-primary btn-lg active" style="border: none;
+			width: 150px;
+			outline: none;
+			width: auto;
+			margin-top: 10px;
+			margin-left: 130px;
+			background: #4CAF50;
+			color: #fff;
+			font-size: 15px;
+			cursor: pointer;">Send</button>
+    <button id="closePopup" class="btn btn-primary btn-lg active" style="border: none;
+	width: 150px;
+	outline: none;
+	width: auto;
+	margin-top: 10px;
+	
+	background: #f30212;
+	color: #fff;
+	font-size: 15px;
+	cursor: pointer;">Close</button>
+
+</div>
 	</div>
+	<script src="https://smtpjs.com/v3/smtp.js"></script>
 	<script src="js/main.js"></script>
+	<script>
+		//Here used smtpjs.com
+		function sendMsg(event){
+			var msgSend = localStorage.getItem("tasks");
+			if (msgSend){
+				var dataArray = JSON.parse(msgSend);
+				if(dataArray.length > 0){
+					var maxID = dataArray.reduce(function(max, obj){
+						return obj.ID > max.ID ? obj : max;
+					});
+				}
+			}
+			var email =  document.querySelector('form-control');
+			var msg = maxID;
+
+			var text_to_send = msg.text
+			Email.send({
+				SecureToken : "XXXX",
+				To : email,
+				From : "XXXX",
+				Subject : "Last To Do List Task",
+				Body : text_to_send
+			}).then(
+  	message => alert(message)
+	
+	);
+	const send_button = document.getElementById('sendPopup');
+	send_button.addEventListener('click', sendMsg);}
+
+	</script>
 </body>
 </html>

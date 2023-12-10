@@ -1,55 +1,96 @@
-
 //find elements on page
 const form = document.querySelector('#form');
 const input = document.querySelector('#taskInput');
 const taskList = document.querySelector('#tasksList');
 const emptyList = document.querySelector('#emptyList');
+const removeAllButton = document.getElementById('removeDoneTasks');
+
+document.addEventListener('DOMContentLoaded', function () {
+    const openButton = document.getElementById('openPopup');
+    const popup = document.getElementById('popup');
+    const closeButton = document.getElementById('closePopup');
+
+    
+    openButton.addEventListener('click', function () {
+        
+        popup.style.display = 'block';
+        
+    });
+
+    closeButton.addEventListener('click', function () {
+        popup.style.display = 'none';
+    });
+});
+
 
 let tasks = [];
 
+
 if (localStorage.getItem('tasks')){
     tasks = JSON.parse(localStorage.getItem('tasks'));
-    tasks.forEach((task) => renderTask(tasks));
+    //tasks.forEach((task) => renderTask(tasks));
 };
 
-// tasks.forEach(function (task){
-//     renderTask(task);
-// });
 
-
+tasks.forEach(function (task){
+    renderTask(task);
+});
 
 
 checkEmptyList();
 
+
+//sort task
+// taskList.addEventListener('click', sortTask);
+
+
+//remove all done tasks
+removeAllButton.addEventListener('click', removeAllDoneTasks);
+
+
 //add task
 form.addEventListener('submit', addTask);
+
 
 //delete task
 taskList.addEventListener('click', deleteTask);
 
+
 //done task
 taskList.addEventListener('click', doneTask);
 
+
 function addTask(event){
     //prevent page reload
-    event.preventDefault();
+    //event.preventDefault();
 
     //take task text from text field
     const taskText = taskInput.value;
+    const dayText = dayInput.value;
+    const monthText = monthInput.value;
+    const minutesText = minutesInput.value;
+    const hoursText = hoursInput.value;
+    const yearText = yearInput.value;
+    
         
-    const currentDate = new Date();
+    //const currentDate = new Date();
 
-    const day = currentDate.getDate();
-    const month = currentDate.getMonth() + 1;
-    const hours = currentDate.getHours();
-    const minutes = currentDate.getMinutes();
-    const year = currentDate.getFullYear();
+    // const day = currentDate.getDate();
+    // const month = currentDate.getMonth() + 1;
+    // const hours = currentDate.getHours();
+    // const minutes = currentDate.getMinutes();
+    //const years = currentDate.getFullYear();
  
-    const id = `${day}.${month}.${year} ${hours}:${minutes}`;
+    // const id = `${day}.${month}.${year} ${hours}:${minutes}`;
     //describe task like object
     const newTask = {
         id: Date.now(),
         text: taskText,
+        hour: Number(hoursText),
+        minute: Number(minutesText),
+        day: Number(dayText),
+        year: Number(yearText),
+        month: Number(monthText),
         done: false
     };
 
@@ -62,6 +103,11 @@ function addTask(event){
 
     //clear text field and save focus
     taskInput.value = "";
+    dayInput.value = "";
+    monthInput.value = "";
+    minutesInput.value = "";
+    hoursInput.value = "";
+    yearInput.value = "";
     taskInput.focus();
 
     // //if in list more then 1 element, "task list is empty" will be hide
@@ -71,6 +117,27 @@ function addTask(event){
     checkEmptyList();
     
 }; 
+
+
+// function sortTask(event){
+//     if (event.target.dataset.action !== 'sortList') return;
+
+//     tasks.sort((a, b) => {
+//         if (a.year !== b.year) {
+//             return a.year - b.year;
+//         }else if (a.month !== b.month){
+//             return a.month - b.month;
+//         }else if (a.day !== b.day){
+//             return a.day - b.day;
+//         }else if (a.hour !== b.hour){
+//             return a.hour - b.hour
+//         }else if (a.minute !== b.minute){
+//             return a.minute - b.minute
+//         }
+//     });
+//     saveToLocalStorage();
+// };
+
 
 function deleteTask(event){
     //if click was not by button "delete"
@@ -115,6 +182,29 @@ function deleteTask(event){
 
 };
 
+
+function removeAllDoneTasks(event){
+    tasks = tasks.filter(function(obj) {
+        return obj.done !== true;
+      });
+    tasks.sort((a, b) => {
+        if (a.year !== b.year) {
+            return a.year - b.year;
+        }else if (a.month !== b.month){
+            return a.month - b.month;
+        }else if (a.day !== b.day){
+            return a.day - b.day;
+        }else if (a.hour !== b.hour){
+            return a.hour - b.hour
+        }else if (a.minute !== b.minute){
+            return a.minute - b.minute
+        }
+    });
+    saveToLocalStorage();
+    location.reload();    
+};
+
+
 function doneTask(event){
     //if click was not by button "done"
     if (event.target.dataset.action !== 'done') return;
@@ -140,10 +230,11 @@ function doneTask(event){
     taskTitle.classList.toggle('task-title--done');
 };
 
+
 function checkEmptyList(){
     if (tasks.length === 0){
         const emptyListHTML = `<li id="emptyList" class="list-group-item empty-list">
-        <img src="./img/leaf.svg" alt="Empty" width="48" class="mt-3">
+        <img src="./img/done.svg" alt="Empty" width="48" class="mt-3">
         <div class="empty-list__title">Task list is empty</div>
         </li>`;
 
@@ -156,18 +247,35 @@ function checkEmptyList(){
     };
 };
 
+
 function saveToLocalStorage(){
     localStorage.setItem('tasks', JSON.stringify(tasks));
 };
 
+
 function renderTask(task){
+    tasks.sort((a, b) => {
+        if (a.year !== b.year) {
+            return a.year - b.year;
+        }else if (a.month !== b.month){
+            return a.month - b.month;
+        }else if (a.day !== b.day){
+            return a.day - b.day;
+        }else if (a.hour !== b.hour){
+            return a.hour - b.hour
+        }else if (a.minute !== b.minute){
+            return a.minute - b.minute
+        }
+    });
+    saveToLocalStorage();
+
     //make CSS class
     const cssClass = task.done ? "task-title task-title--done" : "task-title";
     
     //!create markup for new task
     const taskHTML = `
         <li id="${task.id}" class="list-group-item d-flex justify-content-between task-item">
-        <span class="${cssClass}">${task.text}</span>
+        <span class="${cssClass}"><strong>${task.hour}:${task.minute}</strong> ${task.text}<br><strong>${task.day}.${task.month}.${task.year}</strong></span>
         <div class="task-item__buttons">
         <button type="button" data-action="done" class="btn-action">
         <img src="./img/tick.svg" alt="Done" width="18" height="18">
@@ -179,5 +287,8 @@ function renderTask(task){
         </li>`;
     
     //add task on page
-    taskList.insertAdjacentHTML('beforeend', taskHTML);    
+    taskList.innerHTML += taskHTML;
+    
 };
+
+
